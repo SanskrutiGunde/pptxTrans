@@ -13,6 +13,12 @@ The primary focus is on implementing a full-stack solution for high-fidelity sli
    - Implementing the complete data flow from upload to editing
 
 ## 2. Recent Changes & Accomplishments
+- **Root Route Implementation:**
+  - Created a landing page for the root URL (`/`) to fix the 404 error
+  - Implemented redirection to dashboard for authenticated users
+  - Designed an attractive landing page for first-time visitors with clear CTAs
+  - Resolved Next.js component error by simplifying async component declaration
+
 - **PPTX Processor Service Implementation:**
   - Created a standalone Python FastAPI service with endpoints for PPTX processing
   - Implemented `/v1/process` endpoint for handling PPTX uploads and conversion

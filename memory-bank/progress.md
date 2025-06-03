@@ -12,6 +12,15 @@
         - Auth Callback Handler (`app/auth/callback/route.ts`): Handles email link redirects for password reset
         - Full security implementation with generic messages and proper session handling
 
+- **Root Landing Page (`app/page.tsx`):**
+    - Created landing page for the root route (`/`) to eliminate 404 errors
+    - Automatically redirects authenticated users to `/dashboard`
+    - Provides unauthenticated users with an attractive landing page featuring:
+        - App title and description
+        - "Get Started" and "Sign In" buttons
+        - Feature highlights showcasing key capabilities
+    - Resolves initial navigation and improves overall UX for first-time visitors
+
 - **PPTX Processor Service:**
     - Standalone Python FastAPI microservice (`pptx-processor-service/`) for handling PPTX conversion
     - `/v1/process` endpoint for receiving PPTX files and session metadata
