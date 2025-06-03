@@ -1,0 +1,26 @@
+{
+  "name": "session-service",
+  "version": "1.0.0",
+  "description": "Session management microservice for PowerPoint Translator App",
+  "main": "app/index.ts",
+  "scripts": {
+    "dev": "bun --watch app/index.ts",
+    "start": "bun app/index.ts",
+    "build": "bun build app/index.ts --outdir=dist --target=node",
+    "test": "bun test"
+  },
+  "dependencies": {
+    "@fastify/cors": "^8.3.0",
+    "@fastify/swagger": "^8.8.0",
+    "@supabase/supabase-js": "^2.32.0",
+    "fastify": "^4.21.0",
+    "uuid": "^9.0.0",
+    "zod": "^3.21.4"
+  },
+  "devDependencies": {
+    "@types/node": "^20.4.8",
+    "@types/uuid": "^9.0.2",
+    "bun-types": "^1.0.1",
+    "typescript": "^5.1.6"
+  }
+} 

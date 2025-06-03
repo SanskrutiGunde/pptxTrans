@@ -1,5 +1,7 @@
 import { NextResponse } from "next/server"
 import { createSupabaseAdminClient } from "@/lib/supabase/server" // Using admin for inserts
+import { createSupabaseServerClient } from "@/lib/supabase/server"
+import { v4 as uuidv4 } from "uuid"
 // import { createClient } from '@supabase/supabase-js' // For regular client if preferred
 
 // IMPORTANT: The actual PPTX processing logic (conversion to SVG, text extraction)
@@ -154,40 +156,73 @@ async function processPptxFile(
 
 export async function POST(request: Request) {
   try {
-    const { pptxFilePath, sessionId } = await request.json()
+    const supabase = await createSupabaseServerClient()
+    
+    // Check if user is authenticated
+    const {
+      data: { user },
+    } = await supabase.auth.getUser()
 
-    if (!pptxFilePath || !sessionId) {
-      return NextResponse.json({ success: false, message: "Missing pptxFilePath or sessionId" }, { status: 400 })
+    if (!user) {
+      return NextResponse.json(
+        { error: "Unauthorized" },
+        { status: 401 }
+      )
     }
 
-    const supabaseAdmin = createSupabaseAdminClient() // Use admin for elevated privileges during processing
+    // Parse request body
+    const body = await request.json()
+    const { name, userId, sourceLanguage, targetLanguage } = body
 
-    // Check if user owns the session (important security step)
-    const { data: sessionData, error: sessionError } = await supabaseAdmin
+    // Basic validation
+    if (!name || !userId || !sourceLanguage || !targetLanguage) {
+      return NextResponse.json(
+        { error: "Missing required fields" },
+        { status: 400 }
+      )
+    }
+
+    // Generate a proper UUID for the session
+    const sessionId = uuidv4()
+
+    // Create session in Supabase
+    const { data, error } = await supabase
       .from("translation_sessions")
-      .select("user_id")
-      .eq("id", sessionId)
-      .single()
+      .insert({
+        id: sessionId,
+        user_id: userId,
+        name,
+        status: "pending",
+        progress: 0,
+        slide_count: 0,
+        source_language: sourceLanguage,
+        target_language: targetLanguage,
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString()
+      })
+      .select()
 
-    if (sessionError || !sessionData) {
-      return NextResponse.json({ success: false, message: "Session not found or access denied." }, { status: 404 })
+    if (error) {
+      console.error("Error creating session:", error)
+      return NextResponse.json(
+        { error: "Failed to create session" },
+        { status: 500 }
+      )
     }
-    // If you need to check against the currently authenticated user (e.g. if not using admin client for this check)
-    // const { data: { user } } = await createSupabaseServerClient().auth.getUser(); // Or however you get current user
-    // if (!user || user.id !== sessionData.user_id) {
-    //    return NextResponse.json({ success: false, message: "User does not own this session." }, { status: 403 });
-    // }
 
-    const result = await processPptxFile(pptxFilePath, sessionId, supabaseAdmin)
+    // In a real implementation, we would also start processing the PPTX file here
+    // and update the session status when processing is complete
 
-    if (result.success) {
-      return NextResponse.json(result, { status: 200 })
-    } else {
-      return NextResponse.json(result, { status: 500 })
-    }
+    return NextResponse.json({
+      sessionId,
+      message: "Session created successfully",
+      data
+    })
   } catch (error) {
-    console.error("[API Process PPTX Error]", error)
-    const errorMessage = error instanceof Error ? error.message : "An unknown error occurred"
-    return NextResponse.json({ success: false, message: `Internal server error: ${errorMessage}` }, { status: 500 })
+    console.error("Error in process-pptx API:", error)
+    return NextResponse.json(
+      { error: "Internal server error" },
+      { status: 500 }
+    )
   }
 }

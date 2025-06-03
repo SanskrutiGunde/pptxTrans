@@ -15,6 +15,7 @@ import { Button } from "@/components/ui/button"
 import { Textarea } from "@/components/ui/textarea"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogClose } from "@/components/ui/dialog"
 import { Label } from "@/components/ui/label"
+import { ShareSessionButton } from "@/components/editor/ShareSessionButton"
 
 // MOCK DATA using ProcessedSlide and new SlideShape structure
 const MOCK_PROCESSED_SLIDES: ProcessedSlide[] = [
@@ -265,6 +266,10 @@ export default function SlideEditorPage() {
   return (
     <div className="flex h-screen flex-col overflow-hidden">
       <DashboardHeader user={user} />
+      <div className="p-2 border-b flex justify-between items-center">
+        <h1 className="text-xl font-semibold">{session?.name}</h1>
+        <ShareSessionButton sessionId={sessionId} />
+      </div>
       <div className="flex flex-1 overflow-hidden border-t">
         <aside className="w-64 flex-shrink-0 border-r bg-background overflow-y-auto">
           {/* Ensure SlideNavigator can handle ProcessedSlide[] and use svg_url for thumbnails */}

@@ -1,4 +1,5 @@
 export type SessionStatus = "draft" | "in-progress" | "ready"
+export type PermissionType = "view" | "edit"
 
 export interface TranslationSession {
   id: string
@@ -14,6 +15,37 @@ export interface TranslationSession {
   thumbnail_url: string | null
   original_file_path: string | null
   translated_file_path?: string | null
+  is_shared?: boolean
+  owner?: {
+    id: string
+    email: string
+    full_name?: string
+  } | null
+}
+
+export interface SessionPermission {
+  id: string
+  session_id: string
+  user_id: string
+  permission_type: PermissionType
+  created_at: string
+  updated_at: string
+  user?: {
+    id: string
+    email: string
+    full_name?: string
+  }
+}
+
+export interface Notification {
+  id: string
+  user_id: string
+  type: string
+  title: string
+  message: string
+  action_url: string | null
+  is_read: boolean
+  created_at: string
 }
 
 export interface SlideShape {

@@ -111,9 +111,27 @@ export default function UploadWizard({ onComplete, supportedLanguages, userId }:
 
     // Mock session creation (replace with actual Supabase call)
     try {
-      // const { data, error } = await supabase.from('translation_sessions').insert({ ... }).select();
-      await new Promise((resolve) => setTimeout(resolve, 1500)) // Simulate API
-      const newSessionId = `sess_${Date.now()}` // Mock ID
+      // Instead of creating a string ID, we'll call the session service API
+      const response = await fetch("/api/process-pptx", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          name: sessionName,
+          userId: userId,
+          sourceLanguage,
+          targetLanguage,
+          // Other parameters as needed
+        }),
+      })
+
+      if (!response.ok) {
+        throw new Error("Failed to create session")
+      }
+
+      const data = await response.json()
+      const newSessionId = data.sessionId // Use the UUID from the response
       setMockSessionId(newSessionId)
 
       setIsCreatingSession(false)
@@ -134,8 +152,8 @@ export default function UploadWizard({ onComplete, supportedLanguages, userId }:
 
   const handleShareNow = () => {
     if (mockSessionId) {
-      // Implement share logic or redirect to a share page
-      alert(`Sharing session: ${sessionName} (ID: ${mockSessionId}) - (Sharing not implemented)`)
+      // Redirect to the session sharing page
+      router.push(`/dashboard/share/${mockSessionId}`);
     }
   }
 
